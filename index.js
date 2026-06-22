@@ -150,7 +150,7 @@ app.post('/api/login', async (req, res) => {
     if (usuario.email === 'owner@mantra.com') {
       rol = 'owner';
     } else {
-      const orgQuery = await pool.query(
+const orgQuery = await pool.query(
   `
   SELECT id_usuario
   FROM public.organizador
@@ -164,6 +164,7 @@ if (orgQuery.rows.length > 0) {
 } else {
   rol = 'asistidor';
 }
+    }
     res.json({
   success:true,
   usuario:{
