@@ -15,7 +15,43 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname)));
+app.use(async (req, res, next) => {
 
+  const idUsuario =
+    req.body?.id_usuario ||
+    req.body?.idOrganizador ||
+    req.body?.id_participante;
+
+  if (!idUsuario) {
+    return next();
+  }
+
+  try {
+
+    const usuario = await pool.query(
+      `
+      SELECT solo_lectura
+      FROM usuario
+      WHERE id_usuario = $1
+      `,
+      [idUsuario]
+    );
+
+    if (
+      usuario.rows.length > 0 &&
+      usuario.rows[0].solo_lectura
+    ) {
+      return res.status(403).json({
+        error: 'Cuenta de demostración. Solo lectura.'
+      });
+    }
+
+    next();
+
+  } catch (err) {
+    next();
+  }
+});
 /* ==========================
    CLOUDINARY + MULTER
 ========================== */
