@@ -151,17 +151,19 @@ app.post('/api/login', async (req, res) => {
       rol = 'owner';
     } else {
       const orgQuery = await pool.query(
-        `
-       SELECT id_usuario,nombre,email,solo_lectura
-       FROM public.usuario
-        WHERE id_usuario = $1
-        `,
-        [usuario.id_usuario]
-      );
+  `
+  SELECT id_usuario
+  FROM public.organizador
+  WHERE id_usuario = $1
+  `,
+  [usuario.id_usuario]
+);
 
-      if (orgQuery.rows.length > 0) rol = 'organizador';
-    }
-
+if (orgQuery.rows.length > 0) {
+  rol = 'organizador';
+} else {
+  rol = 'asistidor';
+}
     res.json({
   success:true,
   usuario:{
