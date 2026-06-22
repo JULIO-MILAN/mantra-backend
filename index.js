@@ -369,6 +369,7 @@ app.post('/api/asistencia', async (req, res) => {
 ========================== */
 
 app.post('/api/eventos/crear', upload.single('imagen'), async (req, res) => {
+
   const {
     titulo,
     fecha,
@@ -378,6 +379,24 @@ app.post('/api/eventos/crear', upload.single('imagen'), async (req, res) => {
     idOrganizador,
     id_categoria
   } = req.body;
+
+  const usuario = await pool.query(
+    `
+    SELECT solo_lectura
+    FROM usuario
+    WHERE id_usuario = $1
+    `,
+    [idOrganizador]
+  );
+
+  if (
+    usuario.rows.length > 0 &&
+    usuario.rows[0].solo_lectura
+  ) {
+    return res.status(403).json({
+      error: 'Cuenta de demostración. Solo lectura.'
+    });
+  }
 
   try {
     const imagen_url = req.file
