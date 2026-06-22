@@ -95,7 +95,7 @@ app.post('/api/login', async (req, res) => {
   try {
     const userQuery = await pool.query(
       `
-      SELECT id_usuario, nombre, email
+      SELECT id_usuario,nombre,email,solo_lectura
       FROM public.usuario
       WHERE email = $1 AND password = $2
       `,
@@ -116,8 +116,8 @@ app.post('/api/login', async (req, res) => {
     } else {
       const orgQuery = await pool.query(
         `
-        SELECT id_usuario
-        FROM public.organizador
+       SELECT id_usuario,nombre,email,solo_lectura
+       FROM public.usuario
         WHERE id_usuario = $1
         `,
         [usuario.id_usuario]
@@ -127,14 +127,15 @@ app.post('/api/login', async (req, res) => {
     }
 
     res.json({
-      success: true,
-      usuario: {
-        id_usuario: usuario.id_usuario,
-        nombre: usuario.nombre,
-        email: usuario.email,
-        rol
-      }
-    });
+  success:true,
+  usuario:{
+    id_usuario:usuario.id_usuario,
+    nombre:usuario.nombre,
+    email:usuario.email,
+    rol,
+    solo_lectura:usuario.solo_lectura
+  }
+   });
 
   } catch (err) {
     console.error(err.stack);
